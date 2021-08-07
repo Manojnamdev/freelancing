@@ -1,0 +1,46 @@
+---
+- name: Configuring openstack instance
+  hosts: localhost
+  become: true
+  gather_facts: no
+  tasks: 
+  - name: Disable and Stop Firewall service
+    service:
+      name: firewalld
+      state: stopped
+      enabled: False
+
+  - name: Disable and Stop network manager service
+    service:
+      name: NetworkManager
+      state: stopped
+      enabled: False
+
+  - selinux:
+      policy: targeted
+      state: permissive
+
+  - name: upgrade all packages
+    yum:
+      name: '*'
+      state: latest
+
+  - name: Ensure useful util libs are present
+    yum:
+      name:
+        - vim
+        - wget
+        - curl
+        - telnet
+        - bash-completion
+      state: present 
+    become: True
+
+  - name: line insert
+    lineinfile:
+      path: vi /etc/environment
+      state: present
+      line: "{{ item }}"
+    with_items:
+    - 'LANG=en_US.utf-8'
+    - 'LC_ALL=en_US.utf-8'

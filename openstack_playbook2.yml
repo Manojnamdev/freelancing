@@ -1,0 +1,31 @@
+---
+- name: Installing openstack cloud
+  hosts: localhost
+  become: true
+  gather_facts: no
+  tasks: 
+
+  - name: Install openstack repo
+    yum:
+      name: centos-release-openstack-train
+      state: present 
+    become: True
+
+  - name: upgrade all packages
+    yum:
+      name: '*'
+      state: latest
+
+  - name: Install openstack package
+    yum:
+      name: openstack-packstack
+      state: present
+    become: True
+
+  - name: Gather openstack installation data
+    command:  packstack --allinone
+    register: output
+
+  - debug:
+      var: output
+      verbosity: 2
